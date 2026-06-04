@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISF: Plan & Direction</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --sf-blue: #29B5E8;
+    --sf-navy: #1B3054;
+    --sf-dark: #0D1B2E;
+    --sf-mid: #1E4A7B;
+    --sf-light-blue: #E8F7FD;
+    --sf-accent: #00C6E0;
+    --sf-white: #FFFFFF;
+    --sf-gray: #6B7B8D;
+    --sf-light-gray: #F4F7FA;
+    --sf-green: #1DB976;
+    --sf-orange: #F5A623;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0D1B2E;
+    color: var(--sf-white);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 40px;
+    background: rgba(13,27,46,0.95);
+    border-bottom: 1px solid rgba(41,181,232,0.2);
+    z-index: 100;
+    flex-shrink: 0;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .nav-logo svg { width: 32px; height: 32px; }
+  .nav-brand { font-size: 15px; font-weight: 600; color: var(--sf-white); letter-spacing: 0.3px; }
+  .nav-title { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 400; }
+  .slide-indicators { display: flex; gap: 8px; align-items: center; }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); cursor: pointer;
+    transition: all 0.25s;
+  }
+  .dot.active { background: var(--sf-blue); transform: scale(1.25); }
+  .nav-arrows { display: flex; gap: 8px; }
+  .nav-btn {
+    background: rgba(41,181,232,0.12); border: 1px solid rgba(41,181,232,0.3);
+    color: var(--sf-blue); border-radius: 6px; padding: 6px 14px;
+    cursor: pointer; font-size: 13px; font-weight: 500;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: rgba(41,181,232,0.22); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  /* SLIDES */
+  .slides-container { flex: 1; position: relative; overflow: hidden; }
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0; transform: translateX(40px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+    overflow-y: auto;
+    padding: 40px 56px;
+  }
+  .slide.active {
+    opacity: 1; transform: translateX(0);
+    pointer-events: all;
+  }
+  .slide.exit {
+    opacity: 0; transform: translateX(-40px);
+  }
+
+  /* ─── SLIDE 1: TITLE ─── */
+  #slide-1 {
+    background: linear-gradient(135deg, #0D1B2E 0%, #1B3054 50%, #0D2845 100%);
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+  }
+  .slide1-eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 2.5px;
+    text-transform: uppercase; color: var(--sf-blue);
+    margin-bottom: 20px;
+  }
+  .slide1-title {
+    font-size: 52px; font-weight: 700; line-height: 1.1;
+    color: var(--sf-white); max-width: 720px;
+    margin-bottom: 24px;
+  }
+  .slide1-title span { color: var(--sf-blue); }
+  .slide1-subtitle {
+    font-size: 18px; color: rgba(255,255,255,0.65);
+    max-width: 600px; line-height: 1.6; margin-bottom: 48px;
+  }
+  .slide1-pills { display: flex; gap: 12px; flex-wrap: wrap; }
+  .pill {
+    padding: 8px 18px; border-radius: 100px;
+    font-size: 13px; font-weight: 500;
+    border: 1px solid rgba(41,181,232,0.4);
+    color: var(--sf-blue); background: rgba(41,181,232,0.08);
+  }
+  .slide1-decoration {
+    position: absolute; right: 56px; top: 50%; transform: translateY(-50%);
+    opacity: 0.07; pointer-events: none;
+  }
+
+  /* ─── SHARED LAYOUT ─── */
+  .slide-header { margin-bottom: 32px; }
+  .slide-number { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--sf-blue); margin-bottom: 8px; }
+  .slide-title { font-size: 30px; font-weight: 700; color: var(--sf-white); line-height: 1.2; }
+  .slide-title span { color: var(--sf-blue); }
+  .slide-subtitle { font-size: 15px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+  .divider { width: 48px; height: 3px; background: var(--sf-blue); border-radius: 2px; margin-top: 14px; }
+
+  /* ─── SLIDE 2: WHAT IS ISF ─── */
+  #slide-2 { background: #0D1B2E; }
+  .s2-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .s2-problem {
+    background: rgba(255,80,80,0.06); border: 1px solid rgba(255,80,80,0.2);
+    border-radius: 12px; padding: 24px;
+  }
+  .s2-solution {
+    background: rgba(41,181,232,0.06); border: 1px solid rgba(41,181,232,0.2);
+    border-radius: 12px; padding: 24px;
+  }
+  .s2-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+  .s2-label.problem { color: #FF6B6B; }
+  .s2-label.solution { color: var(--sf-blue); }
+  .s2-bullets { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .s2-bullets li { font-size: 13.5px; color: rgba(255,255,255,0.75); display: flex; gap: 10px; align-items: flex-start; line-height: 1.5; }
+  .s2-bullets li::before { content: ''; flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; }
+  .s2-problem .s2-bullets li::before { background: #FF6B6B; }
+  .s2-solution .s2-bullets li::before { background: var(--sf-blue); }
+
+  .s2-access { margin-top: 24px; }
+  .s2-access-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.6); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+  .s2-channels { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .channel-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 16px;
+  }
+  .channel-card-label { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .channel-card-label.internal { color: var(--sf-green); }
+  .channel-card-label.external { color: var(--sf-orange); }
+  .channel-items { display: flex; flex-direction: column; gap: 6px; }
+  .channel-item { font-size: 13px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 8px; }
+  .channel-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .channel-dot.internal { background: var(--sf-green); }
+  .channel-dot.external { background: var(--sf-orange); }
+
+  /* ─── SLIDE 3: HOW SOLUTIONS COME TO LIFE ─── */
+  #slide-3 { background: #0D1B2E; }
+  .s3-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  .s3-card {
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 12px; padding: 22px;
+  }
+  .s3-card-title { font-size: 14px; font-weight: 700; color: var(--sf-white); margin-bottom: 12px; display: flex; align-items: center; gap: 9px; }
+  .s3-card-title .badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 9px; border-radius: 100px;
+  }
+  .badge.live { background: rgba(29,185,118,0.15); color: var(--sf-green); border: 1px solid rgba(29,185,118,0.3); }
+  .badge.pilot { background: rgba(41,181,232,0.15); color: var(--sf-blue); border: 1px solid rgba(41,181,232,0.3); }
+  .badge.wip { background: rgba(245,166,35,0.15); color: var(--sf-orange); border: 1px solid rgba(245,166,35,0.3); }
+  .s3-bullets { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .s3-bullets li { font-size: 13px; color: rgba(255,255,255,0.7); display: flex; gap: 9px; line-height: 1.5; }
+  .s3-bullets li::before { content: '–'; color: var(--sf-blue); flex-shrink: 0; font-weight: 700; }
+
+  .s3-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 0; }
+  .stat-box {
+    background: rgba(41,181,232,0.07); border: 1px solid rgba(41,181,232,0.2);
+    border-radius: 10px; padding: 16px; text-align: center;
+  }
+  .stat-num { font-size: 32px; font-weight: 700; color: var(--sf-blue); line-height: 1; }
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+  .s3-timeline {
+    margin-top: 20px; background: rgba(41,181,232,0.05);
+    border: 1px solid rgba(41,181,232,0.2); border-radius: 10px; padding: 16px 20px;
+  }
+  .s3-timeline-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--sf-blue); margin-bottom: 12px; }
+  .timeline-track { display: flex; gap: 0; align-items: center; }
+  .t-step {
+    flex: 1; text-align: center; position: relative;
+  }
+  .t-step:not(:last-child)::after {
+    content: '→'; position: absolute; right: -10px; top: 50%; transform: translateY(-50%);
+    color: rgba(41,181,232,0.5); font-size: 16px;
+  }
+  .t-circle {
+    width: 34px; height: 34px; border-radius: 50%; margin: 0 auto 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+  }
+  .t-circle.done { background: var(--sf-green); color: #fff; }
+  .t-circle.active { background: var(--sf-blue); color: #fff; }
+  .t-circle.next { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.15); }
+  .t-label { font-size: 11px; color: rgba(255,255,255,0.6); line-height: 1.3; }
+
+  /* ─── SLIDE 4: THE PLAN ─── */
+  #slide-4 { background: #0D1B2E; }
+  .s4-three-col { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px; }
+  .s4-pillar {
+    border-radius: 12px; padding: 22px;
+    border: 1px solid;
+  }
+  .s4-pillar.p1 { background: rgba(41,181,232,0.06); border-color: rgba(41,181,232,0.25); }
+  .s4-pillar.p2 { background: rgba(29,185,118,0.06); border-color: rgba(29,185,118,0.25); }
+  .s4-pillar.p3 { background: rgba(245,166,35,0.06); border-color: rgba(245,166,35,0.25); }
+  .s4-pillar-icon { font-size: 22px; margin-bottom: 10px; }
+  .s4-pillar-title { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+  .s4-pillar.p1 .s4-pillar-title { color: var(--sf-blue); }
+  .s4-pillar.p2 .s4-pillar-title { color: var(--sf-green); }
+  .s4-pillar.p3 .s4-pillar-title { color: var(--sf-orange); }
+  .s4-pillar-sub { font-size: 11px; color: rgba(255,255,255,0.4); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .s4-pillar-items { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .s4-pillar-items li { font-size: 12.5px; color: rgba(255,255,255,0.7); display: flex; gap: 8px; line-height: 1.4; }
+  .s4-pillar-items li::before { content: '✓'; font-size: 11px; flex-shrink: 0; margin-top: 1px; font-weight: 700; }
+  .s4-pillar.p1 .s4-pillar-items li::before { color: var(--sf-blue); }
+  .s4-pillar.p2 .s4-pillar-items li::before { color: var(--sf-green); }
+  .s4-pillar.p3 .s4-pillar-items li::before { color: var(--sf-orange); }
+
+  .s4-bottom {
+    background: linear-gradient(90deg, rgba(41,181,232,0.08) 0%, rgba(41,181,232,0.03) 100%);
+    border: 1px solid rgba(41,181,232,0.2); border-radius: 12px;
+    padding: 18px 24px; display: flex; align-items: center; gap: 20px;
+  }
+  .s4-bottom-label { font-size: 12px; font-weight: 700; color: var(--sf-blue); text-transform: uppercase; letter-spacing: 1.5px; white-space: nowrap; }
+  .s4-bottom-text { font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.5; }
+  .s4-bottom-divider { width: 1px; height: 40px; background: rgba(41,181,232,0.3); flex-shrink: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(41,181,232,0.3); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <svg viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="20" fill="#29B5E8" opacity="0.15"/>
+      <path d="M20 8 L20 32 M8 20 L32 20 M11.5 11.5 L28.5 28.5 M28.5 11.5 L11.5 28.5" stroke="#29B5E8" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <span class="nav-brand">Industry Solutions Framework</span>
+  </div>
+  <div class="nav-title">Leadership Overview · June 2026</div>
+  <div style="display:flex; align-items:center; gap:20px;">
+    <div class="slide-indicators">
+      <div class="dot active" onclick="goTo(0)"></div>
+      <div class="dot" onclick="goTo(1)"></div>
+      <div class="dot" onclick="goTo(2)"></div>
+      <div class="dot" onclick="goTo(3)"></div>
+      <div class="dot" onclick="goTo(4)"></div>
+    </div>
+    <div class="nav-arrows">
+      <button class="nav-btn" id="prev-btn" onclick="prev()" disabled>← Prev</button>
+      <button class="nav-btn" id="next-btn" onclick="next()">Next →</button>
+    </div>
+  </div>
+</nav>
+
+<div class="slides-container">
+
+  <!-- ═══════════════════════ SLIDE 1 ═══════════════════════ -->
+  <div class="slide active" id="slide-1">
+    <div class="slide1-eyebrow">Industry Solutions Framework</div>
+    <div class="slide1-title">The Engine for <span>Outcome-Based</span> Selling</div>
+    <div class="slide1-subtitle">
+      ISF is Snowflake's single source of truth for how we solve real customer problems — connecting business outcomes to validated, actionable solutions.
+    </div>
+    <div class="slide1-pills">
+      <div class="pill">Core Platform Rebuild</div>
+      <div class="pill">Solution Packaging</div>
+      <div class="pill">Industry Council Governance</div>
+      <div class="pill">Field + Customer Access</div>
+    </div>
+
+    <svg class="slide1-decoration" width="480" height="480" viewBox="0 0 480 480">
+      <circle cx="240" cy="240" r="200" stroke="white" stroke-width="1.5" fill="none"/>
+      <circle cx="240" cy="240" r="140" stroke="white" stroke-width="1" fill="none"/>
+      <circle cx="240" cy="240" r="80" stroke="white" stroke-width="0.8" fill="none"/>
+      <line x1="240" y1="40" x2="240" y2="440" stroke="white" stroke-width="0.8"/>
+      <line x1="40" y1="240" x2="440" y2="240" stroke="white" stroke-width="0.8"/>
+      <line x1="98" y1="98" x2="382" y2="382" stroke="white" stroke-width="0.5"/>
+      <line x1="382" y1="98" x2="98" y2="382" stroke="white" stroke-width="0.5"/>
+    </svg>
+  </div>
+
+  <!-- ═══════════════════════ SLIDE 2 ═══════════════════════ -->
+  <div class="slide" id="slide-2">
+    <div class="slide-header">
+      <div class="slide-number">01 / What is ISF</div>
+      <div class="slide-title">The Core Engine — and <span>How People Access It</span></div>
+      <div class="slide-subtitle">ISF connects business problems → personas → use cases → validated solutions → actionable assets</div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="s2-grid">
+      <div class="s2-problem">
+        <div class="s2-label problem">The Problem Today</div>
+        <ul class="s2-bullets">
+          <li>Field reinvents solutions across teams and regions — tribal knowledge, ad-hoc content</li>
+          <li>Inconsistent demo and messaging quality across engagements</li>
+          <li>Hard to connect a customer's business problem to a proven execution path</li>
+          <li>Existing ISF is overwhelming — too much content, unclear what to focus on, leaving users confused about where to start</li>
+          <li>Missing assets (especially customer-shareable demos) and poor discoverability</li>
+        </ul>
+      </div>
+      <div class="s2-solution">
+        <div class="s2-label solution">What ISF Becomes</div>
+        <ul class="s2-bullets">
+          <li>A solution intelligence layer — the single source of truth for how Snowflake solves customer problems</li>
+          <li>Every solution = core metadata + an actionable solution package (skills plugin or deployable demo)</li>
+          <li>Curated, high-quality catalog — only validated solutions, automated freshness enforcement</li>
+          <li>Feedback-driven: usage signals improve recommendations over time</li>
+          <li>Accessible internally and externally through multiple surfaces</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="s2-access">
+      <div class="s2-access-title">Where the field and customers access ISF</div>
+      <div class="s2-channels">
+        <div class="channel-card">
+          <div class="channel-card-label internal">Internal / Field</div>
+          <div class="channel-items">
+            <div class="channel-item"><div class="channel-dot internal"></div>ISF UI — browse, search, evaluate</div>
+            <div class="channel-item"><div class="channel-dot internal"></div>Industry profiles in Snowhouse (e.g., HCLS: 26+ skills, zero setup)</div>
+            <div class="channel-item"><div class="channel-dot internal"></div>Agents in Snowflake CoWork (e.g., MFG Concierge)</div>
+          </div>
+        </div>
+        <div class="channel-card">
+          <div class="channel-card-label external">External / Partners & Customers</div>
+          <div class="channel-items">
+            <div class="channel-item"><div class="channel-dot external"></div>Developer solutions page</div>
+            <div class="channel-item"><div class="channel-dot external"></div>Partner-specific agent or skill for self-service browsing</div>
+            <div class="channel-item"><div class="channel-dot external"></div>Future: customer-facing solution exploration (defined, not yet built)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SLIDE 3: PRODUCT ═══════════════════════ -->
+  <div class="slide" id="slide-3-product">
+    <div class="slide-header">
+      <div class="slide-number">02 / What We're Building in the Product</div>
+      <div class="slide-title">Focus Areas for <span>Rebuilding the ISF Core</span></div>
+      <div class="slide-subtitle">Making ISF a tool the field can trust — high quality, easy to navigate, and always actionable</div>
+      <div class="divider"></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:11px; padding:18px 20px; display:flex; gap:14px;">
+        <div style="background:rgba(41,181,232,0.12); border:1px solid rgba(41,181,232,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--sf-blue); flex-shrink:0;">1</div>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:var(--sf-white); margin-bottom:6px;">Clean Up & Redefine Solution Quality</div>
+          <div style="font-size:12.5px; color:rgba(255,255,255,0.6); line-height:1.55;">Audit all existing solutions and remove anything that doesn't meet the quality bar. Redefine what fields a solution actually needs — slimming down the overwhelming content model so users aren't confused about what to focus on.</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:11px; padding:18px 20px; display:flex; gap:14px;">
+        <div style="background:rgba(41,181,232,0.12); border:1px solid rgba(41,181,232,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--sf-blue); flex-shrink:0;">2</div>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:var(--sf-white); margin-bottom:6px;">Simplify the UI</div>
+          <div style="font-size:12.5px; color:rgba(255,255,255,0.6); line-height:1.55;">Make it fast and intuitive for the field to find what they need. Reduce friction in navigation, surface the most relevant solutions upfront, and cut the noise so AEs and SEs can get in and out quickly.</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:11px; padding:18px 20px; display:flex; gap:14px;">
+        <div style="background:rgba(41,181,232,0.12); border:1px solid rgba(41,181,232,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--sf-blue); flex-shrink:0;">3</div>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:var(--sf-white); margin-bottom:6px;">Improve Recommendations (WLC Integration)</div>
+          <div style="font-size:12.5px; color:rgba(255,255,255,0.6); line-height:1.55;">Improve and simplify the recommendations experience in partnership with the WLC team. Account teams should clearly see what their customer's peers are doing and where the whitespace opportunities are — contextual and account-specific, not a generic list.</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:11px; padding:18px 20px; display:flex; gap:14px;">
+        <div style="background:rgba(41,181,232,0.12); border:1px solid rgba(41,181,232,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--sf-blue); flex-shrink:0;">4</div>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:var(--sf-white); margin-bottom:6px;">Regular Reviews & Freshness Enforcement</div>
+          <div style="font-size:12.5px; color:rgba(255,255,255,0.6); line-height:1.55;">Set up automated scans to detect outdated content and flag anything that needs updating. The field needs to trust that what's in ISF is current — stale solutions are clearly marked or removed before they cause damage.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+
+      <div style="background:rgba(41,181,232,0.06); border:1px solid rgba(41,181,232,0.22); border-radius:11px; padding:18px 20px; display:flex; gap:14px;">
+        <div style="background:rgba(41,181,232,0.12); border:1px solid rgba(41,181,232,0.25); border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:var(--sf-blue); flex-shrink:0;">5</div>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:var(--sf-white); margin-bottom:6px;">Every Solution = Metadata + Actionable Package</div>
+          <div style="font-size:12.5px; color:rgba(255,255,255,0.6); line-height:1.55;">No solution ships without a deployable asset attached — either a skills plugin or a pre-built demo with a validated talk track. We're also creating clear guidance for consumers on how to deploy and use these packages so there's no ambiguity about how to get value from a solution.</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(29,185,118,0.05); border:1px solid rgba(29,185,118,0.2); border-radius:11px; padding:18px 20px; display:flex; gap:14px;">
+        <div style="font-size:22px; flex-shrink:0; margin-top:2px;">⚙️</div>
+        <div>
+          <div style="font-size:13px; font-weight:700; color:var(--sf-green); margin-bottom:6px;">ISF Kit — CoCo Skills for Managing ISF</div>
+          <div style="font-size:12.5px; color:rgba(255,255,255,0.6); line-height:1.55;">We're building CoCo skills to power these processes — with clear guidance and tooling for the field and industry specialists to contribute: <span style="color:rgba(255,255,255,0.85);">ISF Reader</span> (query & explore solutions), <span style="color:rgba(255,255,255,0.85);">ISF Creator</span> (author new solutions from POCs and demos), and <span style="color:rgba(255,255,255,0.85);">ISF Contributor</span> (update and maintain existing solutions). The goal is to make contributing to ISF as low-friction as possible.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SLIDE 4 (was 3) ═══════════════════════ -->
+  <div class="slide" id="slide-3">
+    <div class="slide-header">
+      <div class="slide-number">03 / How Solutions Come to Life</div>
+      <div class="slide-title">Crowdsourced, <span>Governed, Actionable</span></div>
+      <div class="slide-subtitle">The Industry Skills Initiative is the mechanism for packaging and maintaining high-quality solution assets</div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="s3-two-col">
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div class="s3-card">
+          <div class="s3-card-title">Solution Packaging Model <span class="badge wip">Defining</span></div>
+          <ul class="s3-bullets">
+            <li>Every solution must include an actionable package: either a skills plugin (contextualizable, interactive) or a deployable pre-built demo with validated talk track</li>
+            <li>Working with DevRel on best practices for plugin packaging and publishing</li>
+            <li>CoCo plugins to help deploy solutions — clear standards for how assets are built and referenced</li>
+            <li>Platform vs. product skills will have defined rules for how they're referenced</li>
+          </ul>
+        </div>
+        <div class="s3-card">
+          <div class="s3-card-title">Industry Councils <span class="badge pilot">HCLS Pilot</span></div>
+          <ul class="s3-bullets">
+            <li>Cross-functional councils own quality, review, and maintenance of solutions per vertical</li>
+            <li>HCLS pilot in progress: Sales Leadership, PS, Industry Principals as governing body</li>
+            <li>2-month pilot timeline → incorporate learnings → roll out to all other industries</li>
+            <li>Dedicated contributor launchpads for SEs to submit and refine skills</li>
+            <li>Slack channels per industry for field engagement (#coco-hcls-skills, etc.)</li>
+          </ul>
+        </div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <div style="background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.25); border-radius:10px; padding:14px 16px;">
+          <div style="font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--sf-orange); margin-bottom:10px;">Manufacturing Snapshot · Pilot Vertical</div>
+          <div class="s3-stats" style="margin:0;">
+            <div class="stat-box"><div class="stat-num">53</div><div class="stat-label">Skills</div></div>
+            <div class="stat-box"><div class="stat-num">47</div><div class="stat-label">Accelerators</div></div>
+            <div class="stat-box"><div class="stat-num">20</div><div class="stat-label">Active POCs</div></div>
+          </div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.4); margin-top:10px; line-height:1.4;">Numbers reflect MFG only — HCLS, PubSec, and additional verticals are also in active development</div>
+        </div>
+        <div class="s3-card">
+          <div class="s3-card-title">Early Traction <span class="badge live">Live</span></div>
+          <ul class="s3-bullets">
+            <li>HCLS profile live on Snowhouse (26+ skills, zero setup); incubator repo active</li>
+            <li>MFG Skills Concierge Agent live via Snowflake CoWork; 53 skills across 5 sub-verticals</li>
+            <li>Partners: CitiusTech / Kipi piloting HCLS skill co-development</li>
+            <li>Natera: PS scoping implementation using lab ops skills</li>
+            <li>CVS: Clinical doc extraction for Rev Codes — workshop in progress</li>
+          </ul>
+        </div>
+        <div class="s3-timeline">
+          <div class="s3-timeline-label">Rollout Trajectory</div>
+          <div class="timeline-track">
+            <div class="t-step">
+              <div class="t-circle done">✓</div>
+              <div class="t-label">HCLS & MFG<br>Incubation</div>
+            </div>
+            <div class="t-step">
+              <div class="t-circle active">→</div>
+              <div class="t-label">HCLS Council<br>2-Mo Pilot</div>
+            </div>
+            <div class="t-step">
+              <div class="t-circle next">3</div>
+              <div class="t-label">Incorporate<br>Learnings</div>
+            </div>
+            <div class="t-step">
+              <div class="t-circle next">4</div>
+              <div class="t-label">Roll Out to<br>All Verticals</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ SLIDE 4 ═══════════════════════ -->
+  <div class="slide" id="slide-4">
+    <div class="slide-header">
+      <div class="slide-number">04 / The Plan</div>
+      <div class="slide-title">Three Parallel Tracks, <span>One Coherent Direction</span></div>
+      <div class="slide-subtitle">We're marching on the core platform, solution packaging, and governance simultaneously</div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="s4-three-col">
+      <div class="s4-pillar p1">
+        <div class="s4-pillar-icon">🏗️</div>
+        <div class="s4-pillar-title">Track 1: Rebuild the Core</div>
+        <div class="s4-pillar-sub">Platform & Content Quality</div>
+        <ul class="s4-pillar-items">
+          <li>Simplify the solution data model — remove bloat, define minimum viable content</li>
+          <li>Audit all existing solutions; remove those that don't meet quality bar</li>
+          <li>Every solution must have a solution package — no packageless solutions in the catalog</li>
+          <li>Enforce automated freshness & completeness checks (auto-unpublish stale content)</li>
+          <li>Update ISF UI for faster discovery, trust signals, and asset visibility</li>
+        </ul>
+      </div>
+      <div class="s4-pillar p2">
+        <div class="s4-pillar-icon">⚙️</div>
+        <div class="s4-pillar-title">Track 2: Define the Packaging Standard</div>
+        <div class="s4-pillar-sub">Skills & Solution Assets</div>
+        <ul class="s4-pillar-items">
+          <li>Finalize plugin packaging format with DevRel — best practices, tooling, CI/CD</li>
+          <li>Build CoCo plugins to streamline solution deployment</li>
+          <li>Define rules for platform vs. product skill referencing</li>
+          <li>Establish contributor launchpad: SE submission → IA review → council approval</li>
+          <li>Crowd-source broadly, but be opinionated on quality gates</li>
+        </ul>
+      </div>
+      <div class="s4-pillar p3">
+        <div class="s4-pillar-icon">🏛️</div>
+        <div class="s4-pillar-title">Track 3: Scale Governance</div>
+        <div class="s4-pillar-sub">Industry Councils & Rollout</div>
+        <ul class="s4-pillar-items">
+          <li>HCLS council now active — proving out the model (2-month pilot)</li>
+          <li>Capture learnings on council structure, velocity, and quality enforcement</li>
+          <li>Roll out council model to remaining verticals post-pilot</li>
+          <li>Tie council ownership to solution lifecycle (publish, maintain, retire)</li>
+          <li>Establish success metrics: % solutions meeting bar, field adoption rate</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="s4-bottom">
+      <div class="s4-bottom-label">The North Star</div>
+      <div class="s4-bottom-divider"></div>
+      <div class="s4-bottom-text">
+        ISF becomes the <strong>default tool</strong> for outcome-based selling — where every AE and SE goes to map a customer problem to a proven, actionable solution. Internally through Snowhouse and CoWork agents. Externally through developer solutions and partner channels. Quality enforced by industry councils.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(() => slides[current].classList.remove('exit'), 400);
+    dots[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === slides.length - 1;
+  }
+
+  function next() { if (current < slides.length - 1) goTo(current + 1); }
+  function prev() { if (current > 0) goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prev();
+  });
+</script>
+</body>
+</html>
