@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industry Solutions — Creation &amp; Publication Process</title>
+    <style>
+        :root {
+            --sf-blue: #29B5E8;
+            --sf-dark: #11567F;
+            --sf-navy: #0D2B45;
+            --sf-light: #E8F7FC;
+            --sf-green: #2ECC71;
+            --sf-orange: #F39C12;
+            --sf-gray: #7F8C8D;
+            --sf-white: #FFFFFF;
+            --gate-purple: #8E44AD;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(160deg, #0D2B45 0%, #11567F 50%, #1a6e9e 100%);
+            min-height: 100vh;
+            color: #2c3e50;
+            padding: 50px 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: var(--sf-white);
+        }
+
+        header h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 1.05rem;
+            opacity: 0.8;
+        }
+
+        .prereq {
+            background: var(--sf-white);
+            border-radius: 14px;
+            padding: 28px 32px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            display: flex;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .prereq-box {
+            flex: 1;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid;
+        }
+
+        .prereq-box.metadata {
+            border-color: var(--sf-blue);
+            background: var(--sf-light);
+        }
+
+        .prereq-box.package {
+            border-color: var(--sf-green);
+            background: #EAFAF1;
+        }
+
+        .prereq-box h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .prereq-box .badge {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+            line-height: 22px;
+        }
+
+        .prereq-box.metadata .badge { background: var(--sf-blue); }
+        .prereq-box.package .badge { background: var(--sf-green); }
+
+        .prereq-box p {
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .plus-sign {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--sf-gray);
+        }
+
+        .flow-card {
+            background: var(--sf-white);
+            border-radius: 14px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            position: relative;
+        }
+
+        .flow-label {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .flow-label.internal { background: var(--sf-blue); }
+        .flow-label.external { background: var(--sf-green); }
+
+        .flow-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--sf-navy);
+            margin-bottom: 24px;
+        }
+
+        .pipeline {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .stage {
+            min-width: 180px;
+            max-width: 220px;
+            flex-shrink: 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .stage-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: white;
+        }
+
+        .stage-icon.step { background: var(--sf-blue); }
+        .stage-icon.step-green { background: var(--sf-green); }
+        .stage-icon.gate { background: var(--gate-purple); border: 3px solid #D2B4DE; }
+
+        .stage h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--sf-navy);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .stage p {
+            font-size: 0.78rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .tbd {
+            display: inline-block;
+            background: #FFF3CD;
+            color: #856404;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 3px;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            flex-shrink: 0;
+            padding-top: 14px;
+        }
+
+        .arrow svg {
+            width: 32px;
+            height: 16px;
+        }
+
+        .arrow-blue { color: var(--sf-blue); }
+        .arrow-green { color: var(--sf-green); }
+        .arrow-purple { color: var(--gate-purple); }
+
+        .gate-box {
+            min-width: 200px;
+            max-width: 240px;
+            flex-shrink: 0;
+            text-align: center;
+            background: linear-gradient(135deg, #F9F0FC, #FCF0F0);
+            border: 2px dashed var(--gate-purple);
+            border-radius: 12px;
+            padding: 16px 12px;
+            position: relative;
+        }
+
+        .gate-box h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--gate-purple);
+            margin-bottom: 6px;
+        }
+
+        .gate-box p {
+            font-size: 0.75rem;
+            color: #555;
+            line-height: 1.4;
+        }
+
+        .gate-box .criteria {
+            text-align: left;
+            margin-top: 8px;
+            font-size: 0.72rem;
+            color: #555;
+        }
+
+        .gate-box .criteria li {
+            padding: 2px 0;
+            list-style: none;
+            padding-left: 14px;
+            position: relative;
+        }
+
+        .gate-box .criteria li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            color: var(--gate-purple);
+            font-size: 0.7rem;
+        }
+
+        .open-questions {
+            background: var(--sf-white);
+            border-radius: 14px;
+            padding: 28px 32px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .open-questions h2 {
+            font-size: 1.1rem;
+            color: var(--sf-navy);
+            margin-bottom: 14px;
+        }
+
+        .questions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+        }
+
+        .q-item {
+            font-size: 0.8rem;
+            color: #555;
+            padding: 8px 12px;
+            background: #FFFBE6;
+            border-left: 3px solid var(--sf-orange);
+            border-radius: 4px;
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(255,255,255,0.45);
+            font-size: 0.8rem;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 900px) {
+            .prereq { flex-direction: column; }
+            .plus-sign { justify-content: center; }
+            .pipeline { flex-wrap: wrap; justify-content: center; }
+            .arrow { min-width: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Industry Solutions Process</h1>
+            <p>How Industry Architects and the Field create, validate, and publish solutions.</p>
+        </header>
+
+        <div style="background:var(--sf-white);border-radius:14px;padding:28px 32px;margin-bottom:40px;box-shadow:0 8px 30px rgba(0,0,0,0.12)">
+            <div style="text-align:center;margin-bottom:20px">
+                <span style="font-size:1.1rem;font-weight:700;color:var(--sf-navy)">Every Solution Has Two Required Components</span>
+            </div>
+        <div class="prereq" style="margin-bottom:0;box-shadow:none;padding:0">
+            <div class="prereq-box metadata">
+                <h3><span class="badge">M</span> Solution Metadata</h3>
+                <p>Industry, use case, personas, architecture, value prop. Created via <strong>ISF-Creator skill</strong>. Surfaces in catalogs and discovery.</p>
+            </div>
+            <div class="plus-sign">+</div>
+            <div class="prereq-box package">
+                <h3><span class="badge">P</span> Solution Package (Plugin)</h3>
+                <p>A CoCo plugin in a GitHub repo. Can take two forms: (1) a collection of skills wrapped as an interactive, contextualizable solution, or (2) a deployable pre-built demo with a validated talk track. <span class="tbd">Best practices TBD (Sho)</span></p>
+            </div>
+        </div>
+        </div>
+
+        <!-- FLOW 1: Internal -->
+        <div class="flow-card">
+            <span class="flow-label internal">Flow 1</span>
+            <div class="flow-title">Development / Internal Consumption</div>
+            <div class="pipeline">
+
+                <!-- Step 1: parallel actions -->
+                <div class="stage">
+                    <div class="stage-icon step">1</div>
+                    <h4>Build &amp; Submit</h4>
+                    <p>Author does two things in parallel:</p>
+                    <div style="text-align:left;margin-top:8px;font-size:0.75rem;color:#555;line-height:1.6">
+                        <div style="margin-bottom:6px">
+                            <strong style="color:var(--sf-blue)">Plugin</strong><br>
+                            Push solution plugin to the industry incubator repo.<br>
+                            <a href="https://github.com/Snowflake-Solutions/health-sciences-coco-skills-incubator" style="color:var(--sf-blue);font-size:0.7rem">e.g. HCLS Incubator ↗</a><br>
+                            <a href="#" style="color:#856404;font-size:0.7rem">Plugin creation guidance ↗ <span class="tbd" style="vertical-align:middle">TBD</span></a>
+                        </div>
+                        <div>
+                            <strong style="color:var(--sf-blue)">Metadata</strong><br>
+                            Create solution metadata via ISF-Creator skill. Link the repo to the metadata. Submit for approval.
+                        </div>
+                    </div>
+                    <span class="tbd" style="margin-top:8px;display:inline-block">Plugin format TBD</span>
+                    <span class="tbd" style="display:inline-block">ISF-Creator workflow TBD</span>
+                </div>
+
+                <div class="arrow arrow-purple">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="gate-box">
+                    <h4>Gate 1: Industry Council Review</h4>
+                    <p>Industry Council reviews both the plugin and solution metadata and approves for internal use.</p>
+                    <span class="tbd">Internal quality bar TBD</span>
+                    <span class="tbd">Review SLA TBD</span>
+                </div>
+
+                <div class="arrow arrow-blue">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="stage">
+                    <div class="stage-icon step">2</div>
+                    <h4>Publish to Official Industry Repo</h4>
+                    <p>Council publishes the approved package to the official industry Snowflake Solutions repo.</p>
+                </div>
+
+                <div class="arrow arrow-blue">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="stage">
+                    <div class="stage-icon step">3</div>
+                    <h4>Available Internally</h4>
+                    <p>Account teams use the solution when pitching to customers. Plugin available in the official repo for SEs and SAs to deploy in customer engagements.</p>
+                    <span class="tbd">Customer access process TBD</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- FLOW 2: External -->
+        <div class="flow-card">
+            <span class="flow-label external">Flow 2</span>
+            <div class="flow-title">Deployment / External Publication</div>
+            <div class="pipeline">
+                <div class="stage">
+                    <div class="stage-icon step-green">5</div>
+                    <h4>Nominate for External</h4>
+                    <p>Solution proven internally. Nominate to Council for public promotion.</p>
+                    <span class="tbd">Nomination process TBD</span>
+                </div>
+
+                <div class="arrow arrow-green">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="stage">
+                    <div class="stage-icon step-green">6</div>
+                    <h4>SD Validation & Hardening</h4>
+                    <p>SD validates against prior &amp; active engagements. Industry experts provide input. Solution is not hardened until both reviews are complete.</p>
+                    <span class="tbd">Engagement sourcing TBD</span>
+                </div>
+
+                <div class="arrow arrow-purple">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="gate-box">
+                    <h4>Gate 2: Industry Council Review for External Quality</h4>
+                    <p>Industry Council + SD team review and approve for public release. Includes SD testing, validation, and enrichment. Solution must be vetted with customers, have high-quality documentation and tutorials, and meet the external quality bar as defined by the Industry Council.</p>
+                    <span class="tbd">External quality bar TBD</span>
+                </div>
+
+                <div class="arrow arrow-green">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="stage">
+                    <div class="stage-icon step-green">7</div>
+                    <h4>Push to Snowflake Labs</h4>
+                    <p>Solution code published to public GitHub repo.</p>
+                    <span class="tbd">Submission process TBD</span>
+                </div>
+
+                <div class="arrow arrow-green">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="stage">
+                    <div class="stage-icon step-green">8</div>
+                    <h4>Promote Metadata</h4>
+                    <p>Status → "external". Picked up by partners &amp; customer-facing site.</p>
+                    <span class="tbd">Promotion mechanism TBD</span>
+                </div>
+
+                <div class="arrow arrow-green">
+                    <svg viewBox="0 0 32 16"><path d="M0 8 H24 M20 3 L27 8 L20 13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+
+                <div class="stage">
+                    <div class="stage-icon step-green">✓</div>
+                    <h4>Live &amp; Discoverable</h4>
+                    <p>Public repo + external catalog + solution pages. Single CTA per solution.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Open Questions -->
+        <div class="open-questions">
+            <h2>Open Questions</h2>
+            <div class="questions-grid">
+                <div class="q-item"><strong>Plugin packaging:</strong> Sho to define structure, naming, testing requirements.</div>
+                <div class="q-item"><strong>Solution packages required:</strong> Can we agree all solutions must have a solution package? If not, should we unpublish those without one?</div>
+                <div class="q-item"><strong>ISF cleanup:</strong> Required before scaling. Establish baseline quality.</div>
+                <div class="q-item"><strong>Metadata ↔ Package link:</strong> Technical mechanism to connect them.</div>
+                <div class="q-item"><strong>Versioning:</strong> How do updates to existing solutions flow?</div>
+                <div class="q-item"><strong>Internal quality bar:</strong> What are the exact criteria for a solution to pass Gate 1 (internal council review)?</div>
+                <div class="q-item"><strong>External quality bar:</strong> What are the exact criteria for a solution to pass Gate 2 and be promoted to Snowflake Labs?</div>
+                <div class="q-item"><strong>Review process &amp; SLA:</strong> How will skill/plugin reviews be handled — who is assigned, what is the expected turnaround time, and what happens if a submission is rejected?</div>
+            </div>
+        </div>
+
+        <footer>Industry Solutions Process — Draft v0.1 — May 2026</footer>
+    </div>
+</body>
+</html>
