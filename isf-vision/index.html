@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISF 2.0 — End-State Vision</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #29B5E8; --dark-blue: #0a1628; --mid-blue: #11264f;
+    --teal: #00c4b4; --purple: #7B5EA7; --green: #00b48a;
+    --orange: #F97316; --yellow: #F5C518; --red: #EF4444;
+    --light: #f0f4f8; --white: #ffffff;
+    --text-dark: #0a1628; --text-mid: #334155; --text-light: #64748b;
+    --border: #e2e8f0;
+  }
+  html, body { width:100%; height:100%; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--dark-blue); overflow:hidden; }
+  .deck { width:100vw; height:100vh; position:relative; }
+  .slide { position:absolute; width:100%; height:100%; display:none; overflow-y:auto; }
+  .slide.active { display:flex; flex-direction:column; }
+
+  /* NAV */
+  .nav { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:14px; background:rgba(10,22,40,0.92); border:1px solid rgba(41,181,232,0.3); border-radius:40px; padding:9px 18px; z-index:999; backdrop-filter:blur(8px); }
+  .nav button { background:none; border:none; cursor:pointer; color:var(--blue); font-size:17px; padding:4px 8px; border-radius:6px; transition:background 0.2s; }
+  .nav button:hover { background:rgba(41,181,232,0.15); }
+  .nav button:disabled { color:rgba(41,181,232,0.3); cursor:default; }
+  .nav .counter { color:rgba(255,255,255,0.6); font-size:12px; min-width:52px; text-align:center; }
+  .nav .dots { display:flex; gap:5px; }
+  .nav .dot { width:6px; height:6px; border-radius:50%; background:rgba(41,181,232,0.3); cursor:pointer; transition:background 0.2s; }
+  .nav .dot.active { background:var(--blue); }
+  .progress-bar { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--blue),var(--teal)); transition:width 0.3s ease; z-index:1000; }
+
+  /* STANDARD SLIDE */
+  .slide-standard { background:var(--light); }
+  .slide-header { background:var(--dark-blue); padding:28px 52px 22px; flex-shrink:0; }
+  .slide-header .slide-num { color:var(--blue); font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:6px; }
+  .slide-header h2 { color:var(--white); font-size:clamp(20px,2.6vw,32px); font-weight:700; line-height:1.2; }
+  .slide-header p { color:rgba(255,255,255,0.5); font-size:13px; margin-top:5px; }
+  .slide-body { padding:24px 52px 88px; flex:1; }
+
+  /* TITLE */
+  .slide-title { background:var(--dark-blue); justify-content:center; align-items:center; text-align:center; padding:60px 40px; }
+  .slide-title .eyebrow { color:var(--blue); font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:18px; }
+  .slide-title h1 { color:var(--white); font-size:clamp(34px,5vw,62px); font-weight:700; line-height:1.1; margin-bottom:14px; }
+  .slide-title h1 span { color:var(--blue); }
+  .slide-title .subtitle { color:rgba(255,255,255,0.55); font-size:clamp(15px,1.8vw,20px); max-width:680px; line-height:1.6; margin:0 auto 36px; }
+  .title-divider { width:56px; height:3px; background:linear-gradient(90deg,var(--blue),var(--teal)); border-radius:2px; margin:22px auto; }
+  .slide-title .meta { display:flex; gap:28px; justify-content:center; flex-wrap:wrap; }
+  .slide-title .meta-item { display:flex; align-items:center; gap:7px; color:rgba(255,255,255,0.45); font-size:13px; }
+  .slide-title .meta-item span { color:var(--blue); }
+
+  /* CARDS */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .card { background:var(--white); border-radius:12px; padding:18px 22px; border:1px solid var(--border); }
+  .card h4 { font-size:11px; font-weight:700; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; color:var(--text-light); }
+  .card ul { list-style:none; }
+  .card ul li { font-size:13px; color:var(--text-mid); padding:5px 0; border-bottom:1px solid var(--border); display:flex; align-items:flex-start; gap:8px; line-height:1.4; }
+  .card ul li:last-child { border-bottom:none; }
+  .card ul li::before { content:'→'; color:var(--blue); font-weight:700; flex-shrink:0; }
+  .card ul li.x::before { content:'✕'; color:var(--red); }
+  .card ul li.check::before { content:'✓'; color:var(--green); }
+
+  .north-star-box { background:var(--dark-blue); border:1px solid rgba(41,181,232,0.4); border-radius:14px; padding:22px 30px; margin-bottom:20px; position:relative; overflow:hidden; }
+  .north-star-box::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:linear-gradient(180deg,var(--blue),var(--teal)); }
+  .north-star-box .label { color:var(--blue); font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+  .north-star-box p { color:var(--white); font-size:clamp(14px,1.6vw,18px); line-height:1.6; }
+
+  .tag { display:inline-block; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .tag.blue   { background:rgba(41,181,232,0.12); border:1px solid rgba(41,181,232,0.3); color:var(--blue); }
+  .tag.green  { background:rgba(0,180,138,0.12);  border:1px solid rgba(0,180,138,0.3);  color:var(--green); }
+  .tag.orange { background:rgba(249,115,22,0.12); border:1px solid rgba(249,115,22,0.3); color:var(--orange); }
+  .tag.purple { background:rgba(123,94,167,0.12); border:1px solid rgba(123,94,167,0.3); color:#7B5EA7; }
+  .tag.tbd    { background:rgba(245,197,24,0.12); border:1px solid rgba(245,197,24,0.35); color:#92400e; font-size:9px; padding:2px 7px; }
+
+  /* ── SYSTEM MAP ── */
+  .slide-map { background:#0c1e3a; }
+  .slide-map .slide-header { background:rgba(0,0,0,0.35); border-bottom:1px solid rgba(41,181,232,0.15); }
+  .map-canvas { padding:16px 36px 88px; flex:1; overflow:auto; }
+  .map-layer-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.35); padding:4px 0 7px; border-bottom:1px solid rgba(255,255,255,0.07); margin-bottom:9px; }
+  .map-block { border-radius:10px; padding:12px 15px; border:1px solid rgba(255,255,255,0.1); }
+  .map-block .blk-tag { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .map-block h3 { font-size:13px; font-weight:700; color:var(--white); margin-bottom:6px; }
+  .map-block ul { list-style:none; }
+  .map-block ul li { font-size:11px; color:rgba(255,255,255,0.6); padding:2px 0; line-height:1.4; }
+  .map-block ul li::before { content:'· '; }
+  .blk-blue   { background:rgba(41,181,232,0.1);  border-color:rgba(41,181,232,0.3); }
+  .blk-teal   { background:rgba(0,196,180,0.1);   border-color:rgba(0,196,180,0.3); }
+  .blk-core   { background:rgba(41,181,232,0.06); border:1.5px solid rgba(41,181,232,0.35); }
+  .blk-orange { background:rgba(249,115,22,0.1);  border-color:rgba(249,115,22,0.35); }
+  .blk-yellow { background:rgba(245,197,24,0.08); border-color:rgba(245,197,24,0.3); }
+  .blk-green  { background:rgba(0,180,138,0.1);   border-color:rgba(0,180,138,0.3); }
+  .blk-gray   { background:rgba(100,116,139,0.12);border-color:rgba(100,116,139,0.35); }
+  .blk-tag.blue   { color:var(--blue); }  .blk-tag.teal   { color:var(--teal); }
+  .blk-tag.orange { color:var(--orange); }.blk-tag.yellow { color:var(--yellow); }
+  .blk-tag.green  { color:var(--green); } .blk-tag.gray   { color:rgba(255,255,255,0.45); }
+  .map-flow-arrow { text-align:center; color:rgba(41,181,232,0.4); font-size:12px; padding:4px 0; }
+
+  /* ── ACCESS MODEL ── */
+  .access-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+  .access-col { border-radius:12px; padding:18px; border:1px solid; }
+  .ac-internal { background:#eff9fe; border-color:var(--blue); }
+  .ac-partner  { background:#f5f2ff; border-color:var(--purple); }
+  .ac-external { background:#f0fdf8; border-color:var(--green); }
+  .ac-eyebrow { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; }
+  .ac-internal .ac-eyebrow { color:var(--blue); }
+  .ac-partner  .ac-eyebrow { color:var(--purple); }
+  .ac-external .ac-eyebrow { color:var(--green); }
+  .access-col h3 { font-size:14px; font-weight:700; color:var(--text-dark); margin-bottom:12px; }
+  .ac-surface { background:rgba(255,255,255,0.75); border-radius:8px; padding:9px 12px; margin-bottom:7px; border:1px solid rgba(0,0,0,0.07); }
+  .ac-surface h5 { font-size:12px; font-weight:700; color:var(--text-dark); margin-bottom:3px; }
+  .ac-surface p  { font-size:11px; color:var(--text-mid); line-height:1.4; }
+  .ac-badge { display:inline-block; font-size:9px; font-weight:700; letter-spacing:0.5px; padding:2px 7px; border-radius:10px; margin-bottom:4px; }
+  .b-blue   { background:rgba(41,181,232,0.15); color:var(--blue); }
+  .b-purple { background:rgba(123,94,167,0.15); color:var(--purple); }
+  .b-green  { background:rgba(0,180,138,0.15);  color:var(--green); }
+  .b-orange { background:rgba(249,115,22,0.15); color:var(--orange); }
+  .dep-note { background:#fef3c7; border:1px solid #fcd34d; border-radius:7px; padding:8px 11px; font-size:11px; color:#92400e; margin-top:6px; }
+
+  /* ── SOLUTION / CTAs ── */
+  .solution-wrapper { border:2px solid var(--blue); border-radius:14px; padding:18px; background:var(--white); margin-bottom:16px; }
+  .solution-wrapper .sw-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--blue); margin-bottom:12px; }
+  .metadata-tags { display:flex; flex-wrap:wrap; gap:6px; padding-bottom:14px; border-bottom:1px solid var(--border); margin-bottom:14px; }
+  .cta-columns { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .cta-col { border-radius:10px; padding:16px; border:1.5px solid; }
+  .cta-demo   { border-color:var(--blue);  background:#f5fbff; }
+  .cta-deploy { border-color:var(--green); background:#f3fdf8; }
+  .cta-col .cta-head { display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+  .cta-col .cta-icon { font-size:22px; }
+  .cta-col .cta-head-text .cta-eyebrow { font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; }
+  .cta-demo   .cta-eyebrow { color:var(--blue); }
+  .cta-deploy .cta-eyebrow { color:var(--green); }
+  .cta-col .cta-head-text h4 { font-size:13px; font-weight:700; color:var(--text-dark); }
+  .cta-section { margin-bottom:10px; }
+  .cta-section .cs-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-light); margin-bottom:6px; }
+  .cta-section ul { list-style:none; }
+  .cta-section ul li { font-size:11px; color:var(--text-mid); padding:3px 0; border-bottom:1px solid rgba(0,0,0,0.05); display:flex; gap:6px; align-items:flex-start; line-height:1.4; }
+  .cta-section ul li:last-child { border-bottom:none; }
+  .cta-demo   .cta-section ul li::before { content:'–'; color:var(--blue); flex-shrink:0; }
+  .cta-deploy .cta-section ul li::before { content:'–'; color:var(--green); flex-shrink:0; }
+  .oq-note { font-size:11px; color:#92400e; background:#fef3c7; border:1px solid #fcd34d; border-radius:7px; padding:8px 11px; margin-top:8px; }
+  .oq-note.green { background:#f0fdf8; border-color:#6ee7b7; color:#065f46; }
+
+  /* ── LIFECYCLE ── */
+  .lc-flow { display:flex; align-items:stretch; margin-bottom:16px; overflow-x:auto; }
+  .lc-step { flex:1; min-width:105px; background:var(--white); border:1px solid var(--border); border-radius:9px; padding:12px 9px; text-align:center; }
+  .lc-step.gated { border-color:var(--orange); background:#fff8f2; }
+  .lc-connector { display:flex; align-items:center; justify-content:center; width:20px; flex-shrink:0; color:var(--blue); font-size:15px; padding-top:12px; }
+  .lc-step .lc-num { width:19px; height:19px; background:var(--blue); color:#fff; border-radius:50%; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; margin:0 auto 5px; }
+  .lc-step.gated .lc-num { background:var(--orange); }
+  .lc-step .lc-icon { font-size:18px; margin-bottom:4px; }
+  .lc-step h4 { font-size:11px; font-weight:700; color:var(--text-dark); margin-bottom:3px; }
+  .lc-step p { font-size:10px; color:var(--text-mid); line-height:1.4; }
+  .vis-states { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; margin-bottom:14px; }
+  .vs { background:var(--white); border-radius:8px; padding:11px 13px; border:1px solid var(--border); border-top:3px solid; }
+  .vs h5 { font-size:11px; font-weight:700; margin-bottom:4px; }
+  .vs p { font-size:11px; color:var(--text-mid); line-height:1.4; }
+  .vs-draft    { border-top-color:var(--text-light); }
+  .vs-internal { border-top-color:var(--blue); }
+  .vs-partner  { border-top-color:var(--purple); }
+  .vs-external { border-top-color:var(--green); }
+
+  /* ── WORKSTREAMS ── */
+  .ws-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .ws-card { background:var(--white); border-radius:10px; padding:14px 16px; border:1px solid var(--border); border-left:4px solid; }
+  .ws1 { border-left-color:var(--blue); }   .ws2 { border-left-color:var(--teal); }
+  .ws3 { border-left-color:var(--orange); } .ws4 { border-left-color:var(--purple); }
+  .ws5 { border-left-color:var(--green); }  .ws6 { border-left-color:#a78bfa; }
+  .ws7 { border-left-color:#94a3b8; }
+  .ws-track { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+  .ws1 .ws-track { color:var(--blue); }   .ws2 .ws-track { color:var(--teal); }
+  .ws3 .ws-track { color:var(--orange); } .ws4 .ws-track { color:var(--purple); }
+  .ws5 .ws-track { color:var(--green); }  .ws6 .ws-track { color:#a78bfa; }
+  .ws7 .ws-track { color:#94a3b8; }
+  .ws-card h3 { font-size:13px; font-weight:700; color:var(--text-dark); margin-bottom:8px; }
+  .ws-card ul { list-style:none; }
+  .ws-card ul li { font-size:11px; color:var(--text-mid); padding:3px 0; border-bottom:1px solid var(--border); display:flex; gap:5px; align-items:flex-start; line-height:1.4; }
+  .ws-card ul li:last-child { border-bottom:none; }
+  .ws-card ul li::before { content:'—'; color:var(--text-light); flex-shrink:0; }
+  .ws-pill { display:inline-block; font-size:9px; font-weight:700; padding:1px 6px; border-radius:8px; margin-left:4px; vertical-align:middle; }
+  .p-now  { background:#fef3c7; color:#92400e; }
+  .p-live { background:#dcfce7; color:#166534; }
+  .p-tbd  { background:#f3e8ff; color:#6d28d9; }
+  .p-dep  { background:#fee2e2; color:#991b1b; }
+  .p-later{ background:#e0f2fe; color:#0369a1; }
+  .dep-banner { background:#fff7ed; border:1px solid #fdba74; border-radius:9px; padding:9px 13px; font-size:11px; color:#9a3412; margin-bottom:12px; }
+
+  /* ── ROADMAP ── */
+  .roadmap { display:grid; grid-template-columns:1fr 1fr 1fr; gap:13px; margin-bottom:16px; }
+  .phase { border-radius:11px; padding:16px; border:1px solid; }
+  .phase.p1 { background:#eff9fe; border-color:var(--blue); }
+  .phase.p2 { background:#f5f2ff; border-color:var(--purple); }
+  .phase.p3 { background:#f0fdf8; border-color:var(--green); }
+  .phase-label { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+  .p1 .phase-label { color:var(--blue); } .p2 .phase-label { color:var(--purple); } .p3 .phase-label { color:var(--green); }
+  .phase h3 { font-size:15px; font-weight:700; color:var(--text-dark); margin-bottom:3px; }
+  .phase .tf { font-size:12px; color:var(--text-light); margin-bottom:11px; }
+  .milestone { display:flex; gap:8px; padding:7px 0; border-bottom:1px solid rgba(0,0,0,0.06); font-size:11px; color:var(--text-mid); line-height:1.4; }
+  .milestone:last-child { border-bottom:none; }
+  .milestone .mi { font-size:12px; flex-shrink:0; margin-top:1px; }
+  .milestone strong { color:var(--text-dark); display:block; font-size:11px; }
+
+  /* ── OPEN QUESTIONS ── */
+  .oq-grid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+  .oq-card { background:var(--white); border-radius:10px; padding:15px 17px; border:1px solid var(--border); }
+  .oq-cat { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--orange); margin-bottom:5px; }
+  .oq-card h4 { font-size:13px; font-weight:700; color:var(--text-dark); margin-bottom:8px; }
+  .oq-card ul { list-style:none; }
+  .oq-card ul li { font-size:12px; color:var(--text-mid); padding:5px 0; border-bottom:1px solid var(--border); display:flex; gap:7px; align-items:flex-start; line-height:1.4; }
+  .oq-card ul li:last-child { border-bottom:none; }
+  .oq-card ul li::before { content:'?'; color:var(--orange); font-weight:700; flex-shrink:0; }
+  .oq-card.oq-primary { border-color:var(--blue); background:#eff9fe; }
+  .oq-card.oq-primary .oq-cat { color:var(--blue); }
+  .oq-card.oq-primary ul li::before { color:var(--blue); }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="deck">
+
+<!-- ══════════════════ SLIDE 1: TITLE ══════════════════ -->
+<div class="slide slide-title active" id="slide-1">
+  <div class="eyebrow">Industry Solutions Framework</div>
+  <h1>ISF 2.0<br><span>End-State Vision</span></h1>
+  <div class="title-divider"></div>
+  <p class="subtitle">A solution intelligence layer that connects business problems to validated, actionable solutions — accessible to field, partners, and the developer community.</p>
+  <div class="meta">
+    <div class="meta-item"><span>Author:</span> Stephanie Stillman</div>
+    <div class="meta-item"><span>Date:</span> June 2026</div>
+    <div class="meta-item"><span>Status:</span> Draft — For Alignment</div>
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 2: NORTH STAR ══════════════════ -->
+<div class="slide slide-standard" id="slide-2">
+  <div class="slide-header">
+    <div class="slide-num">01 / North Star</div>
+    <h2>Why We're Rebuilding ISF</h2>
+  </div>
+  <div class="slide-body">
+    <div class="north-star-box">
+      <div class="label">The North Star</div>
+      <p>ISF is the default tool for outcome-based selling — where every AE and SE goes to map a customer problem to a proven, deployable solution. Internally through Snowhouse and CoCo. Externally to partners and the Snowflake Developer Solutions site.</p>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h4>Today — What's Broken</h4>
+        <ul>
+          <li class="x">Solutions reinvented across teams and regions — tribal knowledge</li>
+          <li class="x">Inconsistent demo and messaging quality per engagement</li>
+          <li class="x">Hard to connect a business problem to a proven execution path</li>
+          <li class="x">Backend lives in Snowhouse — blocks partner and external access</li>
+          <li class="x">No deployable assets attached to most solutions</li>
+          <li class="x">No feedback loop — system doesn't improve over time</li>
+          <li class="x">Solution quality is unpredictable — no formal gating today</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Tomorrow — What ISF Becomes</h4>
+        <ul>
+          <li class="check">Single source of truth: business problem → solution → deployable asset</li>
+          <li class="check">Every solution = metadata + a working demo and/or a deploy path</li>
+          <li class="check">Curated, high-quality catalog — quality enforced by Industry Councils</li>
+          <li class="check">Data layer redesigned to enable partner and external access</li>
+          <li class="check">Accessible via UI, CoCo skill/agent, and Snowflake Intelligence</li>
+          <li class="check">Feedback-driven: usage signals improve recommendations over time</li>
+          <li class="check">Solutions available to partners and the Snowflake Developer Solutions site</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 3: SYSTEM MAP ══════════════════ -->
+<div class="slide slide-map" id="slide-3">
+  <div class="slide-header">
+    <div class="slide-num">02 / Architecture</div>
+    <h2>The Full System — Modules & Connections</h2>
+    <p>Layer 3 (packages) and Layer 2 (core platform) are separate but linked within a solution. Layer 4 (consumer access) is independent.</p>
+  </div>
+  <div class="map-canvas">
+
+    <!-- Layer 1: Internal Access (2 cols, no Raven) -->
+    <div style="margin-bottom:8px;">
+      <div class="map-layer-label">Layer 1 — Internal Access Surfaces (AEs · SEs · IAs)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="map-block blk-blue">
+          <div class="blk-tag blue">UX Surface</div>
+          <h3>ISF Internal UI</h3>
+          <ul>
+            <li>Solutions Explorer — browse, search, filter by industry / persona / use case</li>
+            <li>My Accounts Page — account-specific recommendations <span class="tag tbd">TBD</span></li>
+            <li>Full solution metadata + demos + deployable assets visible</li>
+            <li>Contribution and authoring workflows</li>
+            <li>Trust signals: freshness score, usage, owner</li>
+          </ul>
+        </div>
+        <div class="map-block blk-teal">
+          <div class="blk-tag teal">CoCo / Agent</div>
+          <h3>ISF CoCo Access</h3>
+          <ul>
+            <li>ISF Reader — query & explore solutions</li>
+            <li>ISF Creator — author from POCs / demos</li>
+            <li>ISF Contributor — update & maintain</li>
+            <li>General ISF Agent (Snowflake Intelligence)</li>
+            <li>Specific Industry Agents (MFG Concierge live, HCLS in progress)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-flow-arrow">↓ &nbsp; reads · writes · contributes &nbsp; ↓</div>
+
+    <!-- Layer 2 + Layer 3 side by side -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:8px; align-items:start;">
+
+      <!-- Layer 2: Core Platform -->
+      <div>
+        <div class="map-layer-label">Layer 2 — Core Platform (data layer redesign in progress)</div>
+        <div class="map-block blk-core" style="height:100%;">
+          <div style="display:grid; grid-template-columns:1fr; gap:10px;">
+            <div>
+              <div style="color:rgba(41,181,232,0.8); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Data Model</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.6); line-height:1.5;">Solutions · Personas · Use Cases · Pain Points · Industries · Architecture Diagrams · Demos · Accelerators · Visibility States · Lifecycle Status</div>
+            </div>
+            <div>
+              <div style="color:rgba(0,196,180,0.8); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Quality Engine</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.6); line-height:1.5;">Automated freshness checks · Completeness scoring · Broken link detection · Auto-unpublish on quality fail · Owner notifications</div>
+            </div>
+            <div>
+              <div style="color:rgba(123,94,167,0.9); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">Feedback Loop</div>
+              <div style="font-size:11px; color:rgba(255,255,255,0.6); line-height:1.5;">Usage tracking · SFDC account association · Outcome capture · Signal-driven re-ranking · Digest & notifications</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer 3: Solution Packages -->
+      <div>
+        <div class="map-layer-label">Layer 3 — Solution Packages (linked within a solution, independent of Layer 2 content)</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px;">
+          <div class="map-block blk-orange">
+            <div class="blk-tag orange">CTA 1</div>
+            <h3>Demo Hub</h3>
+            <ul>
+              <li>SPCS public URL — zero setup</li>
+              <li>Dedicated demo account (not prod)</li>
+              <li>Generic, clean datasets</li>
+              <li>Internal: Snowsight + SSO</li>
+              <li>External: public HTTPS endpoint</li>
+            </ul>
+          </div>
+          <div class="map-block blk-yellow">
+            <div class="blk-tag yellow">CTA 2</div>
+            <h3>Deploy in Account</h3>
+            <ul>
+              <li>GitHub repo link + deploy guide</li>
+              <li>CoCo-assisted deployment</li>
+              <li>SE submit → Council approve</li>
+              <li>Snowflake Solutions → Labs</li>
+              <li>DevRel CI/CD standards</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="map-flow-arrow">↓ &nbsp; content served (filtered by visibility state) &nbsp; ↓ &nbsp;&nbsp;&nbsp; ↓ &nbsp; packages available &nbsp; ↓</div>
+
+    <!-- Layer 4: Consumer Access -->
+    <div>
+      <div class="map-layer-label">Layer 4 — Consumer Access (reaches into Layers 2 + 3 based on visibility state)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="map-block blk-green">
+          <div class="blk-tag green">Partners</div>
+          <h3>Partner Access</h3>
+          <ul>
+            <li>Non-confidential fields only</li>
+            <li>Personas, use cases, business value, demo + deploy CTAs</li>
+            <li>Via CoCo skill (in progress)</li>
+            <li>Requires data to be made externally accessible</li>
+          </ul>
+        </div>
+        <div class="map-block blk-gray">
+          <div class="blk-tag gray">External (Future)</div>
+          <h3>Developer Solutions Page</h3>
+          <ul>
+            <li>Snowflake Developer Solutions page</li>
+            <li>L3 solutions only (council-approved)</li>
+            <li>One-click deploy from Snowflake Labs</li>
+            <li>Optional external demo access (TBD)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 4: ACCESS MODEL ══════════════════ -->
+<div class="slide slide-standard" id="slide-4">
+  <div class="slide-header">
+    <div class="slide-num">03 / Access Model</div>
+    <h2>Who Accesses ISF — and How</h2>
+    <p>Three distinct access tiers with appropriate surfaces, permissions, and content visibility.</p>
+  </div>
+  <div class="slide-body">
+    <div class="access-grid">
+
+      <div class="access-col ac-internal">
+        <div class="ac-eyebrow">Internal Field</div>
+        <h3>AEs · SEs · IAs</h3>
+        <div class="ac-surface">
+          <div class="ac-badge b-blue">UI</div>
+          <h5>ISF Solutions UI (Snowhouse)</h5>
+          <p>Full solution metadata, architecture diagrams, demos, and deployable assets. Contribution and authoring workflows. All visibility states they're granted access to.</p>
+        </div>
+        <div class="ac-surface">
+          <div class="ac-badge b-blue">CoCo</div>
+          <h5>ISF Skills & Agents</h5>
+          <p>ISF Reader, Creator, Contributor skills. General ISF agent. Industry-specific agents (MFG Concierge live; HCLS in progress).</p>
+        </div>
+        <div class="ac-surface" style="border-color:#fcd34d; background:#fffbeb;">
+          <div class="ac-badge" style="background:#fef3c7; color:#92400e;">Recommendations — Open Question</div>
+          <h5>Account-Specific Recommendations</h5>
+          <p>Should ISF own a Workload Classifier integration, or should this be owned by another team? Decision needed before scoping this work.</p>
+        </div>
+      </div>
+
+      <div class="access-col ac-partner">
+        <div class="ac-eyebrow">Partners</div>
+        <h3>Implementation & Delivery Partners</h3>
+        <div class="ac-surface">
+          <div class="ac-badge b-purple">CoCo Skill</div>
+          <h5>Partner-Facing Skill (in progress)</h5>
+          <p>Exposes non-confidential solution content only. Requirements gathering with partner team in progress.</p>
+        </div>
+        <div class="ac-surface">
+          <div class="ac-badge b-purple">Content</div>
+          <h5>What Partners See</h5>
+          <p>Personas · Use Cases · Business Value · Architecture · Demo and Deploy CTAs.<br><strong>Not shown:</strong> internal competitive intel, deal context, internal POV fields.</p>
+        </div>
+        <div class="dep-note"><strong>Dependency:</strong> Data must be made externally accessible. Exact mechanism (data share, migration, etc.) TBD with engineering.</div>
+      </div>
+
+      <div class="access-col ac-external">
+        <div class="ac-eyebrow">Customers / Developers (Future)</div>
+        <h3>End Customers & Developers</h3>
+        <div class="ac-surface">
+          <div class="ac-badge b-green">Website</div>
+          <h5>Snowflake Developer Solutions Page</h5>
+          <p>Discover and explore solutions. One-click deploy via Snowflake Labs. L3 (council-approved) solutions only.</p>
+        </div>
+        <div class="ac-surface">
+          <div class="ac-badge b-orange">Demo Access</div>
+          <h5>External Demo Access</h5>
+          <p>Demos via SPCS public endpoints — no Snowflake account required. Compute hosted by Snowflake.</p>
+        </div>
+        <div class="dep-note"><strong>Open:</strong> Compute cost ownership and feasibility require exec decision before this tier is enabled.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 5: SOLUTION DESIGN / TWO CTAs ══════════════════ -->
+<div class="slide slide-standard" id="slide-5">
+  <div class="slide-header">
+    <div class="slide-num">04 / Solution Design</div>
+    <h2>What a Solution Is — and the Two CTAs</h2>
+    <p>The metadata and the actionable packages are all part of one solution. No packageless solutions in the catalog.</p>
+  </div>
+  <div class="slide-body">
+
+    <div class="solution-wrapper">
+      <div class="sw-label">A Solution</div>
+
+      <!-- Metadata row -->
+      <div class="metadata-tags">
+        <span class="tag blue">Business Problem</span>
+        <span class="tag blue">Target Personas</span>
+        <span class="tag blue">Pain Points</span>
+        <span class="tag blue">Use Cases</span>
+        <span class="tag blue">Expected Outcomes</span>
+        <span class="tag blue">Architecture Diagram</span>
+        <span class="tag green">Visibility State</span>
+        <span class="tag green">Freshness Score</span>
+        <span class="tag purple">Industry Council Owner</span>
+      </div>
+
+      <!-- Two CTAs side by side -->
+      <div class="cta-columns">
+
+        <div class="cta-col cta-demo">
+          <div class="cta-head">
+            <div class="cta-icon">🎮</div>
+            <div class="cta-head-text">
+              <div class="cta-eyebrow">CTA 1</div>
+              <h4>Get Demo</h4>
+            </div>
+          </div>
+
+          <div class="cta-section">
+            <div class="cs-title">How It Works (Proposal — many open Qs)</div>
+            <ul>
+              <li>One click — zero deployment or account setup required</li>
+              <li>Demo runs in a dedicated Snowflake account (separate from prod)</li>
+              <li>Access provisioned via SnowBiz or similar (TBD)</li>
+              <li>Generic, clean datasets — not customer-specific</li>
+            </ul>
+          </div>
+
+          <div class="cta-section">
+            <div class="cs-title">Privilege Model (Proposal)</div>
+            <ul>
+              <li><strong>Internal (field):</strong> Snowsight URL + SSO — each user authenticates with their own identity</li>
+              <li><strong>External (partners/customers):</strong> SPCS public HTTPS endpoint — no Snowflake account required</li>
+              <li>All demo data is read-only; isolated per solution</li>
+              <li>Session-scoped for any write operations</li>
+            </ul>
+          </div>
+
+          <div class="oq-note">Note: The demo hub model is still being defined — account structure, access provisioning, and compute ownership are all open questions.</div>
+        </div>
+
+        <div class="cta-col cta-deploy">
+          <div class="cta-head">
+            <div class="cta-icon">🚀</div>
+            <div class="cta-head-text">
+              <div class="cta-eyebrow">CTA 2</div>
+              <h4>Deploy in Account</h4>
+            </div>
+          </div>
+
+          <div class="cta-section">
+            <div class="cs-title">Plugin Packaging Standard</div>
+            <ul>
+              <li>CoCo plugins are the preferred format — more deterministic for complex solutions</li>
+              <li>DevRel partnership on best practices, tooling, and CI/CD standards</li>
+              <li>Clear rules for platform vs. product skill referencing</li>
+              <li>Contributor launchpad: SE submission → IA review → Council approval</li>
+            </ul>
+          </div>
+
+          <div class="cta-section">
+            <div class="cs-title">Repo Flow</div>
+            <ul>
+              <li>SE builds in personal or incubator repo</li>
+              <li>Submits to Snowflake Solutions repo (internal)</li>
+              <li>Industry Council approves → pushed to Snowflake Labs (customer-facing)</li>
+              <li>Only L3 (council-approved) solutions are externally available</li>
+              <li>Automated quality + freshness checks run on repos continuously</li>
+            </ul>
+          </div>
+
+          <div class="oq-note green">Open: Formal agreement with DevRel on repo structure, CI/CD standards, and Snowflake Labs publishing ownership needed.</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 6: LIFECYCLE & GOVERNANCE ══════════════════ -->
+<div class="slide slide-standard" id="slide-6">
+  <div class="slide-header">
+    <div class="slide-num">05 / Governance</div>
+    <h2>Solution Lifecycle & Industry Council Model</h2>
+    <p>Nothing gets published without council approval. Automated quality checks enforce freshness after publish.</p>
+  </div>
+  <div class="slide-body">
+
+    <div class="lc-flow" style="margin-bottom:16px;">
+      <div class="lc-step">
+        <div class="lc-num">1</div>
+        <div class="lc-icon">✍️</div>
+        <h4>Create</h4>
+        <p>SE/IA authors via UI or CoCo (ISF Creator). Auto-draft from existing POC or demo artifacts.</p>
+      </div>
+      <div class="lc-connector">→</div>
+      <div class="lc-step">
+        <div class="lc-num">2</div>
+        <div class="lc-icon">📋</div>
+        <h4>Submit</h4>
+        <p>Contributor submits for review. Status becomes <em>Submitted for Approval</em>.</p>
+      </div>
+      <div class="lc-connector">→</div>
+      <div class="lc-step lc-step gated">
+        <div class="lc-num">3</div>
+        <div class="lc-icon">🏛️</div>
+        <h4>Council Review</h4>
+        <p>Industry Council validates quality, industry alignment, and completeness. <strong>Hard gate.</strong></p>
+      </div>
+      <div class="lc-connector">→</div>
+      <div class="lc-step">
+        <div class="lc-num">4</div>
+        <div class="lc-icon">✅</div>
+        <h4>Publish</h4>
+        <p>Council sets visibility state. Internal Only → + Partners → + External (L3 only).</p>
+      </div>
+      <div class="lc-connector">→</div>
+      <div class="lc-step">
+        <div class="lc-num">5</div>
+        <div class="lc-icon">📊</div>
+        <h4>In Use</h4>
+        <p>Field uses, logs against SFDC accounts, captures outcomes. Usage feeds ranking and scoring.</p>
+      </div>
+      <div class="lc-connector">→</div>
+      <div class="lc-step lc-step gated">
+        <div class="lc-num">6</div>
+        <div class="lc-icon">🔄</div>
+        <h4>Maintain / Retire</h4>
+        <p>Automated checks flag stale content. Owner notified. Fails quality gate → auto-unpublish with safeguard review.</p>
+      </div>
+    </div>
+
+    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-light); margin-bottom:9px;">Visibility States</div>
+    <div class="vis-states" style="margin-bottom:14px;">
+      <div class="vs vs-draft"><h5>Draft</h5><p>Visible only to contributors. Not searchable.</p></div>
+      <div class="vs vs-internal"><h5>Published — Internal Only</h5><p>All internal Snowflake employees. Not available to partners.</p></div>
+      <div class="vs vs-partner"><h5>Published — Internal + Partners</h5><p>Approved partners. Non-confidential fields only. Certain fields always masked.</p></div>
+      <div class="vs vs-external"><h5>Published — External (L3 only)</h5><p>Developer Solutions page. Council-approved. Highest quality bar. Internal fields always masked.</p></div>
+    </div>
+
+    <div class="card" style="background:#eff9fe; border-color:var(--blue);">
+      <h4 style="color:var(--blue);">Industry Council Model</h4>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:8px;">
+        <div><div style="font-size:11px; font-weight:700; margin-bottom:4px;">Composition</div><div style="font-size:12px; color:var(--text-mid);">Sales Leadership · PS · Industry Principals. Cross-functional per vertical. Dedicated Slack channels per industry.</div></div>
+        <div><div style="font-size:11px; font-weight:700; margin-bottom:4px;">Responsibilities</div><div style="font-size:12px; color:var(--text-mid);">Quality gate · Industry alignment · Approve publish state · Own maintenance · Drive retirement decisions</div></div>
+        <div><div style="font-size:11px; font-weight:700; margin-bottom:4px;">Rollout</div><div style="font-size:12px; color:var(--text-mid);">HCLS pilot active (2-month) → Incorporate learnings → Roll out to all verticals · MFG concurrently in progress</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 7: WORKSTREAMS ══════════════════ -->
+<div class="slide slide-standard" id="slide-7">
+  <div class="slide-header">
+    <div class="slide-num">06 / Workstreams</div>
+    <h2>Seven Parallel Tracks</h2>
+    <p>Tracks 4, 5, 6, and 7 are dependent on Track 1 (data layer) being complete first.</p>
+  </div>
+  <div class="slide-body">
+
+    <div class="dep-banner">
+      <strong>Critical Dependency:</strong> Tracks 4, 5, 6, and 7 require the data layer (Track 1) to be accessible externally before partner or consumer access is possible. All other tracks can run in parallel.
+    </div>
+
+    <div class="ws-grid">
+
+      <div class="ws-card ws1">
+        <div class="ws-track">Track 1 — Foundation <span class="ws-pill p-now">Now</span></div>
+        <h3>Core Platform & Data Layer</h3>
+        <ul>
+          <li>Redesign data layer — make data externally accessible <span class="ws-pill p-now">Critical path</span></li>
+          <li>Simplify + redefine solution data model</li>
+          <li>Audit all existing solutions; remove below-bar</li>
+          <li>Build automated freshness & quality engine</li>
+          <li>Enforce completeness gates (no packageless solutions)</li>
+        </ul>
+      </div>
+
+      <div class="ws-card ws2">
+        <div class="ws-track">Track 2 — Solution Packages <span class="ws-pill p-now">Now</span></div>
+        <h3>Deploy CTA & Plugin Standard</h3>
+        <ul>
+          <li>Define plugin packaging format with DevRel</li>
+          <li>Build Snowflake Solutions repo structure</li>
+          <li>Wire Deploy CTA (GitHub link) to solution pages</li>
+          <li>Define L1 / L2 / L3 solution quality tiers</li>
+          <li>Contributor launchpad: SE submit → IA review → Council approve</li>
+        </ul>
+      </div>
+
+      <div class="ws-card ws3">
+        <div class="ws-track">Track 3 — Demo Hub <span class="ws-pill p-later">After Track 2</span></div>
+        <h3>Demo CTA & Hub Infrastructure</h3>
+        <ul>
+          <li>Define demo hub account + privilege model</li>
+          <li>Build internal demo access (Snowsight + SSO)</li>
+          <li>Wire Demo CTA (SPCS URL) to solution pages</li>
+          <li>External demo access pending compute decision <span class="ws-pill p-tbd">TBD</span></li>
+        </ul>
+      </div>
+
+      <div class="ws-card ws4">
+        <div class="ws-track">Track 4 — Governance <span class="ws-pill p-now">Now</span></div>
+        <h3>Industry Council Rollout</h3>
+        <ul>
+          <li>HCLS Council pilot — active (2-month) <span class="ws-pill p-live">Live</span></li>
+          <li>Capture learnings on council velocity + quality gates</li>
+          <li>Build approval workflow in ISF UI</li>
+          <li>Roll council model to remaining verticals</li>
+          <li>Tie council ownership to solution lifecycle (publish/retire)</li>
+        </ul>
+      </div>
+
+      <div class="ws-card ws5">
+        <div class="ws-track">Track 5 — Partner Access <span class="ws-pill p-dep">Needs Track 1</span></div>
+        <h3>Partner Externalization</h3>
+        <ul>
+          <li>Gather requirements from partner team <span class="ws-pill p-now">In progress</span></li>
+          <li>Define content visibility rules (what is shareable)</li>
+          <li>Build partner-facing CoCo skill</li>
+          <li>Pilot with CitiusTech / Kipi (HCLS co-development)</li>
+        </ul>
+      </div>
+
+      <div class="ws-card ws6">
+        <div class="ws-track">Track 6 — Multi-Modal Access <span class="ws-pill p-dep">Needs Track 1</span></div>
+        <h3>CoCo Skills + ISF Agents</h3>
+        <ul>
+          <li>ISF Reader, Creator, Contributor skills <span class="ws-pill p-now">In progress</span></li>
+          <li>Industry agents (MFG Concierge live) <span class="ws-pill p-live">Live</span></li>
+          <li>General ISF agent via Snowflake Intelligence</li>
+          <li>Workload Classifier integration <span class="ws-pill" style="background:#fee2e2; color:#991b1b;">Out of scope? — Decision needed</span></li>
+          <li>ISF UI redesign (design now, launch later)</li>
+        </ul>
+      </div>
+
+      <div class="ws-card ws7" style="grid-column:1/-1;">
+        <div class="ws-track">Track 7 — Future Customer Access <span class="ws-pill p-tbd">TBD</span></div>
+        <h3>Snowflake Developer Solutions Page & External Reach</h3>
+        <ul style="display:grid; grid-template-columns:1fr 1fr; gap:0 24px;">
+          <li>Developer Solutions page — customer-facing solution discovery <span class="ws-pill p-dep">Needs Tracks 1 + 4</span></li>
+          <li>One-click deploy from Snowflake Labs (L3 solutions only)</li>
+          <li>External demo access via SPCS public endpoints <span class="ws-pill p-tbd">Pending compute decision</span></li>
+          <li>Requires Phase 2 completeness before any customer-facing work</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 8: ROADMAP ══════════════════ -->
+<div class="slide slide-standard" id="slide-8">
+  <div class="slide-header">
+    <div class="slide-num">07 / Roadmap</div>
+    <h2>Phased Milestones</h2>
+    <p>Sequencing and timing TBD with engineering team. Phase 1 is a prerequisite for all downstream access.</p>
+  </div>
+  <div class="slide-body">
+    <div class="roadmap">
+
+      <div class="phase p1">
+        <div class="phase-label">Phase 1</div>
+        <h3>Foundation</h3>
+        <div class="tf">Timeline: TBD with engineering</div>
+        <div class="milestone"><span class="mi">🏗️</span><div><strong>Data layer redesign</strong>Redesign backend data model and make data externally accessible. Mechanism TBD (data share or equivalent).</div></div>
+        <div class="milestone"><span class="mi">🧹</span><div><strong>Solution audit + model simplification</strong>Remove below-bar solutions, enforce new quality standards and completeness gates.</div></div>
+        <div class="milestone"><span class="mi">🏛️</span><div><strong>HCLS Council pilot → learnings</strong>Prove the council model — velocity, quality gates, contributor experience. Apply to all verticals.</div></div>
+        <div class="milestone"><span class="mi">📦</span><div><strong>Plugin packaging standard v1</strong>Define format with DevRel. CI/CD pipeline. Deploy CTA wired to first packaged solutions.</div></div>
+        <div class="milestone"><span class="mi">🎨</span><div><strong>ISF UI redesign (design phase)</strong>Redesign begins. Launch held for Phase 2 pending stability of underlying data.</div></div>
+      </div>
+
+      <div class="phase p2">
+        <div class="phase-label">Phase 2</div>
+        <h3>Access Expansion</h3>
+        <div class="tf">Timeline: TBD with engineering</div>
+        <div class="milestone"><span class="mi">🚀</span><div><strong>Launch redesigned ISF UI</strong>New UI goes live with simplified discovery, trust signals, and asset visibility.</div></div>
+        <div class="milestone"><span class="mi">🤝</span><div><strong>Partner access goes live</strong>Partner-facing CoCo skill launched. Non-confidential solutions visible to approved partners.</div></div>
+        <div class="milestone"><span class="mi">🎮</span><div><strong>Demo hub operational</strong>CTA 1 live. Internal field can access demos via Snowsight + SSO.</div></div>
+        <div class="milestone"><span class="mi">🌍</span><div><strong>All verticals have active councils</strong>HCLS learnings applied. Governance running across all industries.</div></div>
+        <div class="milestone"><span class="mi">🤖</span><div><strong>ISF agents + CoCo skills live</strong>ISF Reader, Creator, Contributor, and General ISF agent available to field.</div></div>
+      </div>
+
+      <div class="phase p3">
+        <div class="phase-label">Phase 3</div>
+        <h3>External & Scale</h3>
+        <div class="tf">Timeline: TBD</div>
+        <div class="milestone"><span class="mi">🌐</span><div><strong>Developer Solutions page live</strong>Customer-facing discovery. L3 solutions on Snowflake Labs. One-click deploy.</div></div>
+        <div class="milestone"><span class="mi">💡</span><div><strong>External demo access (if approved)</strong>Customers try demos without a Snowflake account. Pending compute cost decision.</div></div>
+        <div class="milestone"><span class="mi">📈</span><div><strong>Feedback loop fully operational</strong>Usage signals drive re-ranking. Automated solution health monitoring at scale.</div></div>
+      </div>
+
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:11px;">
+      <div style="background:var(--white); border-radius:9px; padding:11px 15px; border:1px solid var(--border);">
+        <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">Phase 1 Exit Criteria</div>
+        <div style="font-size:12px; color:#0369a1; font-weight:600;">Data accessible externally · 100% solutions with packages · Council model proven</div>
+      </div>
+      <div style="background:var(--white); border-radius:9px; padding:11px 15px; border:1px solid var(--border);">
+        <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">Phase 2 Exit Criteria</div>
+        <div style="font-size:12px; color:#6d28d9; font-weight:600;">New UI live · Partner skill live · Demo hub active · All verticals have councils</div>
+      </div>
+      <div style="background:var(--white); border-radius:9px; padding:11px 15px; border:1px solid var(--border);">
+        <div style="font-size:10px; color:var(--text-light); margin-bottom:4px;">North Star Metric</div>
+        <div style="font-size:12px; color:#047857; font-weight:600;">WAU growth · % solutions with working assets · Field adoption rate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 9: OPEN QUESTIONS ══════════════════ -->
+<div class="slide slide-standard" id="slide-9">
+  <div class="slide-header">
+    <div class="slide-num">08 / Open Questions</div>
+    <h2>Decisions Needed to Move Forward</h2>
+    <p>Flagged for leadership alignment. Each blocks a specific downstream workstream.</p>
+  </div>
+  <div class="slide-body">
+    <div class="oq-grid">
+
+      <div class="oq-card oq-primary">
+        <div class="oq-cat">Overarching</div>
+        <h4>Do we agree on the phases and milestones?</h4>
+        <ul>
+          <li>Is the Phase 1 → Phase 2 → Phase 3 sequencing correct?</li>
+          <li>Are the right things in the right phases, or should anything move?</li>
+          <li>What is the engineering team's capacity and realistic timeline for Phase 1?</li>
+        </ul>
+      </div>
+
+      <div class="oq-card">
+        <div class="oq-cat">Partner Access</div>
+        <h4>What can partners see, exactly?</h4>
+        <ul>
+          <li>Which specific fields are always internal-only regardless of visibility state?</li>
+          <li>Is the partner view the same as internal field minus confidential fields?</li>
+          <li>Who on the partner team is defining requirements — and when do we have clarity?</li>
+        </ul>
+      </div>
+
+      <div class="oq-card">
+        <div class="oq-cat">Backend / Data Layer</div>
+        <h4>How do we make data externally accessible?</h4>
+        <ul>
+          <li>Data share from Snowhouse, or full migration to a new data layer?</li>
+          <li>What is the engineering estimate for this work?</li>
+          <li>How do we maintain continuity for the existing app during the transition?</li>
+        </ul>
+      </div>
+
+      <div class="oq-card">
+        <div class="oq-cat">Governance</div>
+        <h4>Council authority and enforcement</h4>
+        <ul>
+          <li>Does leadership agree ISF is the standard and council approval is required to publish?</li>
+          <li>What happens if a council is slow to review — who escalates and on what timeline?</li>
+          <li>How do we handle legacy solutions that predate councils?</li>
+        </ul>
+      </div>
+
+      <div class="oq-card" style="border-color:#f97316; background:#fff7ed;">
+        <div class="oq-cat" style="color:#c2410c;">Scope / Team Ownership</div>
+        <h4>Should ISF own the Workload Classifier integration?</h4>
+        <ul>
+          <li>The WLC integration would surface account-specific ISF recommendations — but it's a significant lift on top of an already unstable foundation</li>
+          <li>Our first priority should be getting ISF's core into a clean, working state. Taking on a WLC integration risks spreading the team too thin</li>
+          <li>Should this be owned by the WLC team, with ISF as the data source? Or should we defer entirely until Phase 2+?</li>
+          <li>Decision needed before this appears in any roadmap or workstream estimate</li>
+        </ul>
+      </div>
+
+      <div class="oq-card">
+        <div class="oq-cat">Repo / Plugin Standard</div>
+        <h4>DevRel agreement and publishing ownership</h4>
+        <ul>
+          <li>Is CoCo plugin the official standard, or are there exceptions?</li>
+          <li>What is the formal agreement with DevRel on repo structure and CI/CD?</li>
+          <li>Who owns Snowflake Labs publishing — DevRel or the Industry Council?</li>
+        </ul>
+      </div>
+
+      <div class="oq-card">
+        <div class="oq-cat">Demo Hub / Compute</div>
+        <h4>Who pays for externally-hosted demos?</h4>
+        <ul>
+          <li>Are we willing to pay Snowflake compute to serve demos externally to customers?</li>
+          <li>What's the cost model — per demo, shared pool, or sponsor account?</li>
+          <li>Which account hosts the demo hub and who owns it operationally?</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<div class="nav">
+  <button id="prevBtn" onclick="navigate(-1)" disabled>◀</button>
+  <div class="dots" id="dotsContainer"></div>
+  <span class="counter" id="counter">1 / 9</span>
+  <button id="nextBtn" onclick="navigate(1)">▶</button>
+</div>
+
+<script>
+  const TOTAL = 9;
+  let current = 1;
+  const dotsContainer = document.getElementById('dotsContainer');
+  for (let i = 1; i <= TOTAL; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsContainer.appendChild(d);
+  }
+  function goTo(n) {
+    document.getElementById('slide-' + current).classList.remove('active');
+    current = Math.max(1, Math.min(TOTAL, n));
+    document.getElementById('slide-' + current).classList.add('active');
+    document.getElementById('counter').textContent = current + ' / ' + TOTAL;
+    document.getElementById('prevBtn').disabled = current === 1;
+    document.getElementById('nextBtn').disabled = current === TOTAL;
+    document.getElementById('progressBar').style.width = ((current / TOTAL) * 100) + '%';
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i + 1 === current));
+    document.getElementById('slide-' + current).scrollTop = 0;
+  }
+  function navigate(dir) { goTo(current + dir); }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+  });
+  goTo(1);
+</script>
+</body>
+</html>
