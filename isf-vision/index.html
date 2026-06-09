@@ -140,6 +140,37 @@
   .oq-note { font-size:11px; color:#92400e; background:#fef3c7; border:1px solid #fcd34d; border-radius:7px; padding:8px 11px; margin-top:8px; }
   .oq-note.green { background:#f0fdf8; border-color:#6ee7b7; color:#065f46; }
 
+  /* ── CONTRIBUTION ── */
+  .contrib-problem { background:var(--dark-blue); border:1px solid rgba(239,68,68,0.35); border-radius:12px; padding:16px 22px; margin-bottom:18px; position:relative; overflow:hidden; }
+  .contrib-problem::before { content:''; position:absolute; top:0; left:0; width:4px; height:100%; background:var(--red); }
+  .contrib-problem .cp-label { color:#f87171; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; }
+  .contrib-problem p { color:rgba(255,255,255,0.8); font-size:14px; line-height:1.6; }
+  .contrib-paths { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:18px; }
+  .cp-card { background:var(--white); border-radius:11px; padding:16px 18px; border:1px solid var(--border); border-top:3px solid; }
+  .cp-card.path-ui     { border-top-color:var(--blue); }
+  .cp-card.path-coco   { border-top-color:var(--teal); }
+  .cp-card.path-auto   { border-top-color:var(--purple); }
+  .cp-card .cp-eyebrow { font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+  .path-ui   .cp-eyebrow { color:var(--blue); }
+  .path-coco .cp-eyebrow { color:var(--teal); }
+  .path-auto .cp-eyebrow { color:var(--purple); }
+  .cp-card h4 { font-size:13px; font-weight:700; color:var(--text-dark); margin-bottom:8px; }
+  .cp-card ul { list-style:none; }
+  .cp-card ul li { font-size:11px; color:var(--text-mid); padding:3px 0; border-bottom:1px solid var(--border); display:flex; gap:6px; align-items:flex-start; line-height:1.4; }
+  .cp-card ul li:last-child { border-bottom:none; }
+  .cp-card ul li::before { content:'–'; color:var(--text-light); flex-shrink:0; }
+  .path-ui   ul li::before { color:var(--blue); }
+  .path-coco ul li::before { color:var(--teal); }
+  .path-auto ul li::before { color:var(--purple); }
+  .contrib-principles { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .contrib-flow { display:flex; align-items:center; gap:0; margin-bottom:18px; overflow-x:auto; }
+  .cf-step { flex:1; min-width:100px; background:var(--white); border:1px solid var(--border); border-radius:9px; padding:11px 9px; text-align:center; }
+  .cf-step .cf-icon { font-size:18px; margin-bottom:4px; }
+  .cf-step h5 { font-size:11px; font-weight:700; color:var(--text-dark); margin-bottom:3px; }
+  .cf-step p { font-size:10px; color:var(--text-mid); line-height:1.3; }
+  .cf-arrow { display:flex; align-items:center; justify-content:center; width:22px; flex-shrink:0; color:var(--blue); font-size:14px; padding-top:10px; }
+  .cf-step.cf-gate { border-color:var(--orange); background:#fff8f2; }
+
   /* ── LIFECYCLE ── */
   .lc-flow { display:flex; align-items:stretch; margin-bottom:16px; overflow-x:auto; }
   .lc-step { flex:1; min-width:105px; background:var(--white); border:1px solid var(--border); border-radius:9px; padding:12px 9px; text-align:center; }
@@ -562,10 +593,129 @@
   </div>
 </div>
 
-<!-- ══════════════════ SLIDE 6: LIFECYCLE & GOVERNANCE ══════════════════ -->
+<!-- ══════════════════ SLIDE 6: CONTRIBUTION EXPERIENCE ══════════════════ -->
 <div class="slide slide-standard" id="slide-6">
   <div class="slide-header">
-    <div class="slide-num">05 / Governance</div>
+    <div class="slide-num">05 / Contribution Experience</div>
+    <h2>Making It Easy to Contribute</h2>
+    <p>We've heard the feedback. Contribution is too hard today — and if contributing is hard, the catalog stays stale.</p>
+  </div>
+  <div class="slide-body">
+
+    <div class="contrib-problem">
+      <div class="cp-label">The Problem Today</div>
+      <p>SEs have great work — POCs, demos, customer-specific solutions — but contributing it to ISF takes too long and requires too much manual effort. The form is overwhelming, the structure is unclear, and there's no guided path. So people don't contribute. And the ones who do often submit incomplete solutions. This is the core content quality problem.</p>
+    </div>
+
+    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-light); margin-bottom:12px;">Three Contribution Paths (in priority order)</div>
+    <div class="contrib-paths">
+
+      <div class="cp-card path-auto">
+        <div class="cp-eyebrow">Path 1 — Lowest Friction</div>
+        <h4>Auto-Draft from Existing Work</h4>
+        <ul>
+          <li>Point ISF Creator at a POC, demo, or existing deck</li>
+          <li>System auto-generates a structured solution draft</li>
+          <li>Contributor reviews, fills gaps, and submits</li>
+          <li>Goal: contribution takes minutes, not hours</li>
+          <li>Reduces blank-page problem — most fields pre-filled</li>
+        </ul>
+      </div>
+
+      <div class="cp-card path-coco">
+        <div class="cp-eyebrow">Path 2 — CoCo Guided</div>
+        <h4>ISF Creator Skill</h4>
+        <ul>
+          <li>Conversational authoring via CoCo</li>
+          <li>Step-by-step prompts: problem → persona → use case → outcome → assets</li>
+          <li>Validates completeness as you go — no surprises at submit</li>
+          <li>Can attach GitHub links, demo URLs, architecture diagrams inline</li>
+          <li>Best for contributors who prefer a guided, interactive flow</li>
+        </ul>
+      </div>
+
+      <div class="cp-card path-ui">
+        <div class="cp-eyebrow">Path 3 — UI Form</div>
+        <h4>Redesigned Contribution UI</h4>
+        <ul>
+          <li>Streamlined form — only required fields shown upfront</li>
+          <li>Progressive disclosure: advanced fields unlocked after basics</li>
+          <li>Inline validation and completeness score as you fill</li>
+          <li>Duplicate detection: flags similar existing solutions before submit</li>
+          <li>Save draft at any point, resume later</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-light); margin-bottom:12px;">Contribution Flow</div>
+    <div class="contrib-flow">
+      <div class="cf-step">
+        <div class="cf-icon">💡</div>
+        <h5>SE has work</h5>
+        <p>POC, demo, deck, or working code from a customer engagement</p>
+      </div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-step" style="border-top:2px solid var(--purple);">
+        <div class="cf-icon">🤖</div>
+        <h5>Auto-draft</h5>
+        <p>ISF Creator generates structured draft from existing artifacts</p>
+      </div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-step">
+        <div class="cf-icon">✏️</div>
+        <h5>Review & refine</h5>
+        <p>Contributor fills gaps, attaches assets, sets visibility intent</p>
+      </div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-step">
+        <div class="cf-icon">📤</div>
+        <h5>Submit</h5>
+        <p>Completeness gate passes. Submitted for council review.</p>
+      </div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-step cf-gate">
+        <div class="cf-icon">🏛️</div>
+        <h5>Council review</h5>
+        <p>Industry Council approves. Visibility state set.</p>
+      </div>
+      <div class="cf-arrow">→</div>
+      <div class="cf-step" style="border-top:2px solid var(--green);">
+        <div class="cf-icon">✅</div>
+        <h5>Published</h5>
+        <p>Solution live in catalog. Owner notified of freshness obligations.</p>
+      </div>
+    </div>
+
+    <div class="contrib-principles">
+      <div class="card" style="border-left:3px solid var(--green);">
+        <h4 style="color:var(--green);">Design Principles</h4>
+        <ul>
+          <li>Lightweight enough for SEs — contribution should feel like part of the workflow, not extra work</li>
+          <li>Structured enough for quality — the system enforces completeness so councils don't have to chase it</li>
+          <li>Automated wherever possible — reduce manual fields through inference and auto-draft</li>
+          <li>Duplicate-aware — prevent redundant solutions before they're created</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:3px solid var(--orange);">
+        <h4 style="color:var(--orange);">What Makes Contribution Hard Today</h4>
+        <ul>
+          <li>Overwhelming number of fields — no clear sense of what's required vs. optional</li>
+          <li>No guided path — contributors start from blank, no templates or prompts</li>
+          <li>No auto-draft — all content must be manually typed or pasted</li>
+          <li>No inline validation — errors only surface at submit time</li>
+          <li>No feedback on completeness until after the fact</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════ SLIDE 7: LIFECYCLE & GOVERNANCE ══════════════════ -->
+<div class="slide slide-standard" id="slide-7">
+  <div class="slide-header">
+    <div class="slide-num">06 / Governance</div>
     <h2>Solution Lifecycle & Industry Council Model</h2>
     <p>Nothing gets published without council approval. Automated quality checks enforce freshness after publish.</p>
   </div>
@@ -635,10 +785,10 @@
   </div>
 </div>
 
-<!-- ══════════════════ SLIDE 7: WORKSTREAMS ══════════════════ -->
-<div class="slide slide-standard" id="slide-7">
+<!-- ══════════════════ SLIDE 8: WORKSTREAMS ══════════════════ -->
+<div class="slide slide-standard" id="slide-8">
   <div class="slide-header">
-    <div class="slide-num">06 / Workstreams</div>
+    <div class="slide-num">07 / Workstreams</div>
     <h2>Seven Parallel Tracks</h2>
     <p>Tracks 4, 5, 6, and 7 are dependent on Track 1 (data layer) being complete first.</p>
   </div>
@@ -735,10 +885,10 @@
   </div>
 </div>
 
-<!-- ══════════════════ SLIDE 8: ROADMAP ══════════════════ -->
-<div class="slide slide-standard" id="slide-8">
+<!-- ══════════════════ SLIDE 9: ROADMAP ══════════════════ -->
+<div class="slide slide-standard" id="slide-9">
   <div class="slide-header">
-    <div class="slide-num">07 / Roadmap</div>
+    <div class="slide-num">08 / Roadmap</div>
     <h2>Phased Milestones</h2>
     <p>Sequencing and timing TBD with engineering team. Phase 1 is a prerequisite for all downstream access.</p>
   </div>
@@ -795,10 +945,10 @@
   </div>
 </div>
 
-<!-- ══════════════════ SLIDE 9: OPEN QUESTIONS ══════════════════ -->
-<div class="slide slide-standard" id="slide-9">
+<!-- ══════════════════ SLIDE 10: OPEN QUESTIONS ══════════════════ -->
+<div class="slide slide-standard" id="slide-10">
   <div class="slide-header">
-    <div class="slide-num">08 / Open Questions</div>
+    <div class="slide-num">09 / Open Questions</div>
     <h2>Decisions Needed to Move Forward</h2>
     <p>Flagged for leadership alignment. Each blocks a specific downstream workstream.</p>
   </div>
@@ -885,12 +1035,12 @@
 <div class="nav">
   <button id="prevBtn" onclick="navigate(-1)" disabled>◀</button>
   <div class="dots" id="dotsContainer"></div>
-  <span class="counter" id="counter">1 / 9</span>
+  <span class="counter" id="counter">1 / 10</span>
   <button id="nextBtn" onclick="navigate(1)">▶</button>
 </div>
 
 <script>
-  const TOTAL = 9;
+  const TOTAL = 10;
   let current = 1;
   const dotsContainer = document.getElementById('dotsContainer');
   for (let i = 1; i <= TOTAL; i++) {
